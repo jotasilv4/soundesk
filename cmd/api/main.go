@@ -44,7 +44,12 @@ func main() {
 	if os.Getenv("VERCEL") == "1" {
 		r.StaticFS("/web", http.FS(web.FS))
 		r.GET("/", func(c *gin.Context) {
-			c.FileFromFS("index.html", http.FS(web.FS))
+			data, err := web.FS.ReadFile("index.html")
+			if err != nil {
+				c.String(http.StatusInternalServerError, "Internal Server Error")
+				return
+			}
+			c.Data(http.StatusOK, "text/html; charset=utf-8", data)
 		})
 	} else {
 		r.Static("/web", "./web")
