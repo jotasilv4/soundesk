@@ -875,11 +875,20 @@ button {
         letter-spacing: -0.3px;
     }
 
+    body.session-active .deck-body {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
     body.session-active .sounds-grid-container {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        min-height: 0;
         height: 100%;
     }
 
@@ -889,6 +898,7 @@ button {
         max-height: none;
         overflow-y: auto;
         flex-grow: 1;
+        min-height: 0;
         padding-bottom: 120px; /* Safe space to prevent overlapping with floating dock */
         align-content: start; /* Prevents grid tracks from stretching vertically */
     }
