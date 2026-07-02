@@ -243,7 +243,7 @@ func (s *Store) ensureDefaultSession() {
 
 	if len(s.sessions) == 0 {
 		sess := models.Session{
-			ID:        uuid.New().String(),
+			ID:        "geral",
 			Name:      "Geral",
 			CreatedAt: time.Now(),
 		}
