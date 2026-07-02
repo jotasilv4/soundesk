@@ -893,8 +893,8 @@ button {
     }
 
     body.session-active .sounds-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 pads per row on mobile remote */
-        gap: 0.5rem;
+        grid-template-columns: repeat(4, 1fr); /* 4 pads per row on mobile remote */
+        gap: 0.4rem;
         max-height: none;
         overflow-y: auto;
         flex-grow: 1;
@@ -904,16 +904,16 @@ button {
     }
 
     body.session-active .sound-pad {
-        padding: 1.25rem 0.5rem; /* Tactile padding for thumbs */
-        border-radius: 12px;
+        padding: 0.8rem 0.25rem; /* Compact padding for 4 columns */
+        border-radius: 10px;
     }
 
     body.session-active .sound-pad-icon {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
     }
 
     body.session-active .sound-pad-name {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
 
     body.session-active .activity-log-container {
