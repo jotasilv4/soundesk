@@ -170,6 +170,7 @@ function renderSessionsList(sessions) {
             <div class="session-actions">
                 <button class="btn-vercel-primary" onclick="joinSession('${sess.id}', 'server')">Hospedar</button>
                 <button class="btn-vercel-secondary" onclick="joinSession('${sess.id}', 'client')">Controle</button>
+                <button class="btn-delete" onclick="deleteSession('${sess.id}', event)" title="Excluir Sessão">🗑️</button>
             </div>
         </div>
     `).join('');
@@ -184,10 +185,52 @@ function renderSoundsGrid() {
 
     soundsGrid.innerHTML = soundsList.map(snd => `
         <div class="sound-pad" id="pad-${snd.id}" onclick="triggerPlay('${snd.id}')">
+            <button class="pad-delete-btn" onclick="deleteSound('${snd.id}', event)" title="Excluir Áudio">×</button>
             <span class="sound-pad-icon">🎵</span>
             <span class="sound-pad-name" title="${escapeHTML(snd.name)}">${escapeHTML(snd.name)}</span>
         </div>
     `).join('');
+}
+
+// Delete a session
+async function deleteSession(sessionId, event) {
+    if (event) event.stopPropagation();
+    if (!confirm('Deseja realmente excluir esta sessão?')) return;
+
+    try {
+        const response = await fetch(`/api/v1/sessions/${sessionId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Falha ao excluir sessão');
+        
+        // If we are currently connected to this session, disconnect
+        if (currentSession === sessionId) {
+            leaveSession();
+            showLogMessage('Sistema', 'Sessão atual foi excluída pelo administrador.');
+        }
+
+        await fetchSessions();
+    } catch (err) {
+        alert('Erro ao excluir sessão: ' + err.message);
+    }
+}
+
+// Delete a sound
+async function deleteSound(soundId, event) {
+    if (event) event.stopPropagation();
+    if (!confirm('Deseja realmente excluir este áudio?')) return;
+
+    try {
+        const response = await fetch(`/api/v1/sounds/${soundId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Falha ao excluir áudio');
+        
+        await fetchSounds();
+        showLogMessage('Sistema', 'Áudio excluído com sucesso.');
+    } catch (err) {
+        alert('Erro ao excluir áudio: ' + err.message);
+    }
 }
 
 // Join WebSocket Session

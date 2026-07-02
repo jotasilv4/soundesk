@@ -56,3 +56,18 @@ func (h *SoundHandler) List(c *gin.Context) {
 	sounds := h.store.GetSounds()
 	c.JSON(http.StatusOK, sounds)
 }
+
+func (h *SoundHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	if err := h.store.DeleteSound(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete sound: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "sound deleted successfully"})
+}

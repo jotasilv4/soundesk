@@ -120,3 +120,22 @@ func (h *SessionHandler) Stop(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"status": "stopped"})
 }
+
+func (h *SessionHandler) Delete(c *gin.Context) {
+	sessionID := c.Param("id")
+	if sessionID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	// Close websocket connections for this session
+	h.hub.CloseSession(sessionID)
+
+	// Remove from store
+	if !h.store.DeleteSession(sessionID) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "session not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "session deleted successfully"})
+}

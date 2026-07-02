@@ -427,6 +427,26 @@ button {
     border-radius: 6px;
 }
 
+.btn-delete {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgb(239, 68, 68);
+    color: rgb(239, 68, 68);
+}
+
 .empty-state {
     font-size: 0.75rem;
     color: var(--text-muted);
@@ -616,6 +636,35 @@ button {
     box-shadow: 
         0 2px 4px rgba(0, 0, 0, 0.2), 
         inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.sound-pad .pad-delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 16px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    z-index: 10;
+}
+
+.sound-pad:hover .pad-delete-btn {
+    opacity: 1;
+}
+
+.sound-pad .pad-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: rgb(239, 68, 68);
 }
 
 .sound-pad-icon {

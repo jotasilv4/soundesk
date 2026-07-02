@@ -3,6 +3,7 @@ package store
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -154,4 +155,34 @@ func (s *Store) GetSession(id string) (models.Session, bool) {
 
 	sess, ok := s.sessions[id]
 	return sess, ok
+}
+
+func (s *Store) DeleteSound(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	snd, ok := s.sounds[id]
+	if !ok {
+		return fmt.Errorf("sound not found")
+	}
+
+	// Try deleting the actual audio file
+	if err := os.Remove(snd.FilePath); err != nil && !os.IsNotExist(err) {
+		log.Printf("Warning: failed to delete file %s: %v", snd.FilePath, err)
+	}
+
+	delete(s.sounds, id)
+	return s.saveMetadata()
+}
+
+func (s *Store) DeleteSession(id string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.sessions[id]; !ok {
+		return false
+	}
+
+	delete(s.sessions, id)
+	return true
 }

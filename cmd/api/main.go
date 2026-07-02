@@ -68,6 +68,7 @@ func main() {
 	{
 		sounds.POST("", soundHandler.Create)
 		sounds.GET("", soundHandler.List)
+		sounds.DELETE("/:id", soundHandler.Delete)
 	}
 
 	// Sessions Routes
@@ -79,6 +80,7 @@ func main() {
 		sessions.GET("/:id/ws", sessionHandler.Connect)
 		sessions.POST("/:id/play", sessionHandler.Play)
 		sessions.POST("/:id/stop", sessionHandler.Stop)
+		sessions.DELETE("/:id", sessionHandler.Delete)
 	}
 
 	port := os.Getenv("PORT")

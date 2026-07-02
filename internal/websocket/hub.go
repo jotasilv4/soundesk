@@ -238,3 +238,19 @@ func (h *Hub) BroadcastToSession(sessionID string, msg WSMessage) {
 		}
 	}
 }
+
+func (h *Hub) CloseSession(sessionID string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	clients, ok := h.sessions[sessionID]
+	if !ok {
+		return
+	}
+
+	for client := range clients {
+		client.SendJSON(WSMessage{Type: "error", Message: "Sessão encerrada pelo administrador."})
+		client.Conn.Close()
+	}
+	delete(h.sessions, sessionID)
+}
