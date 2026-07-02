@@ -1,15 +1,18 @@
 package main
 
 import (
-	"io"
+	"embed"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/iv4nz/soundesk/audios"
 	"github.com/iv4nz/soundesk/internal/handlers"
 	"github.com/iv4nz/soundesk/internal/store"
 	"github.com/iv4nz/soundesk/internal/websocket"
+	"github.com/iv4nz/soundesk/web"
 )
 
 func main() {
@@ -20,7 +23,7 @@ func main() {
 	if os.Getenv("VERCEL") == "1" {
 		audiosDir = "/tmp/audios"
 		metadataPath = "/tmp/audios/metadata.json"
-		if err := copyDir("audios", "/tmp/audios"); err != nil {
+		if err := copyEmbeddedDir(audios.FS, ".", "/tmp/audios"); err != nil {
 			log.Printf("Warning: failed to copy initial audios to /tmp: %v", err)
 		}
 	}
@@ -38,8 +41,15 @@ func main() {
 	r.Use(gin.Recovery(), gin.Logger())
 
 	// Serve Frontend Static Files
-	r.Static("/web", "./web")
-	r.StaticFile("/", "./web/index.html")
+	if os.Getenv("VERCEL") == "1" {
+		r.StaticFS("/web", http.FS(web.FS))
+		r.GET("/", func(c *gin.Context) {
+			c.FileFromFS("index.html", http.FS(web.FS))
+		})
+	} else {
+		r.Static("/web", "./web")
+		r.StaticFile("/", "./web/index.html")
+	}
 	
 	// Serve Audio Files Statically so the browser can play them
 	r.Static("/audios", audiosDir)
@@ -81,11 +91,11 @@ func main() {
 	}
 }
 
-func copyDir(src string, dst string) error {
-	if err := os.MkdirAll(dst, 0755); err != nil {
+func copyEmbeddedDir(embedFS embed.FS, srcDir, dstDir string) error {
+	if err := os.MkdirAll(dstDir, 0755); err != nil {
 		return err
 	}
-	entries, err := os.ReadDir(src)
+	entries, err := embedFS.ReadDir(srcDir)
 	if err != nil {
 		return err
 	}
@@ -93,29 +103,16 @@ func copyDir(src string, dst string) error {
 		if entry.IsDir() {
 			continue
 		}
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
+		srcPath := srcDir + "/" + entry.Name()
+		dstPath := filepath.Join(dstDir, entry.Name())
 		
-		if err := copyFile(srcPath, dstPath); err != nil {
+		data, err := embedFS.ReadFile(srcPath)
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(dstPath, data, 0644); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	return err
 }
