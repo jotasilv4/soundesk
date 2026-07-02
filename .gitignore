@@ -1,0 +1,14 @@
+# Binaries
+soundesk
+soundesk.exe
+
+# Audio uploads (user dynamic data)
+audios/*
+!audios/.gitkeep
+
+# IDEs & System files
+.agents
+.gemini
+.idea
+.vscode
+*.log
