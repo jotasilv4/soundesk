@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iv4nz/soundesk/internal/handlers"
@@ -51,8 +52,17 @@ func main() {
 		sessions.POST("/:id/stop", sessionHandler.Stop)
 	}
 
-	log.Println("SounDesk server starting on :8080...")
-	if err := r.Run(":8080"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := port
+	if len(addr) > 0 && addr[0] != ':' {
+		addr = ":" + addr
+	}
+
+	log.Printf("SounDesk server starting on %s...", addr)
+	if err := r.Run(addr); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }
