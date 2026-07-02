@@ -74,6 +74,24 @@ function setupEventListeners() {
             document.body.classList.remove('show-upload-drawer');
         });
     }
+
+    // Audio Authorization Modal Event Listeners
+    const btnAuthAudio = document.getElementById('btn-auth-audio');
+    const audioAuthModal = document.getElementById('audio-auth-modal');
+    if (btnAuthAudio) {
+        btnAuthAudio.addEventListener('click', () => {
+            const unlockAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAAAD');
+            unlockAudio.play().then(() => {
+                console.log('Audio unlocked via permission modal');
+                if (audioAuthModal) {
+                    audioAuthModal.style.display = 'none';
+                }
+                showLogMessage('Sistema', 'Som autorizado com sucesso.');
+            }).catch(err => {
+                console.error('Failed to unlock audio even after click:', err);
+            });
+        });
+    }
 }
 
 // Fetch Sounds from Server
@@ -242,6 +260,7 @@ function joinSession(sessionId, role) {
             console.log('Audio playback unlocked successfully');
         }).catch(err => {
             console.warn('Failed to pre-unlock audio:', err);
+            showAudioAuthModal();
         });
     }
 
@@ -433,7 +452,10 @@ function handleWSMessage(msg) {
                 // First stop any currently playing local audio to avoid overlaps
                 stopAllLocalAudios();
 
-                const audioUrl = '/' + msg.file_path;
+                // Get base filename to construct the correct public static URL (works with windows/unix file paths)
+                const parts = msg.file_path.split(/[/\\]/);
+                const filename = parts[parts.length - 1];
+                const audioUrl = '/audios/' + filename;
                 const audioObj = new Audio(audioUrl);
                 
                 // Track active audio
@@ -445,6 +467,7 @@ function handleWSMessage(msg) {
                 audioObj.play().catch(err => {
                     console.warn('Reprodução pelo navegador bloqueada:', err);
                     showLogMessage('Sistema', 'Clique na página para autorizar som.');
+                    showAudioAuthModal();
                     activeAudios = activeAudios.filter(a => a !== audioObj);
                 });
             }
@@ -506,3 +529,11 @@ document.addEventListener('click', () => {
         console.warn('Global audio unlock failed:', err);
     });
 }, { once: true });
+
+// Helper: Show Audio Authorization Modal
+function showAudioAuthModal() {
+    const modal = document.getElementById('audio-auth-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}

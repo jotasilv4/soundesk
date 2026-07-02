@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -17,6 +18,7 @@ type Store struct {
 	sounds       map[string]models.Sound
 	sessions     map[string]models.Session
 	metadataPath string
+	sessionsPath string
 	audiosDir    string
 }
 
@@ -29,12 +31,19 @@ func NewStore(audiosDir, metadataPath string) (*Store, error) {
 		sounds:       make(map[string]models.Sound),
 		sessions:     make(map[string]models.Session),
 		metadataPath: metadataPath,
+		sessionsPath: filepath.Join(filepath.Dir(metadataPath), "sessions.json"),
 		audiosDir:    audiosDir,
 	}
 
 	if err := s.loadMetadata(); err != nil {
 		return nil, fmt.Errorf("failed to load metadata: %w", err)
 	}
+
+	if err := s.loadSessions(); err != nil {
+		return nil, fmt.Errorf("failed to load sessions: %w", err)
+	}
+
+	s.ensureDefaultSession()
 
 	return s, nil
 }
@@ -135,6 +144,7 @@ func (s *Store) CreateSession(name string) models.Session {
 	}
 
 	s.sessions[sess.ID] = sess
+	_ = s.saveSessions()
 	return sess
 }
 
@@ -184,5 +194,65 @@ func (s *Store) DeleteSession(id string) bool {
 	}
 
 	delete(s.sessions, id)
+	_ = s.saveSessions()
 	return true
+}
+
+func (s *Store) loadSessions() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, err := os.Stat(s.sessionsPath); os.IsNotExist(err) {
+		return nil
+	}
+
+	data, err := os.ReadFile(s.sessionsPath)
+	if err != nil {
+		return err
+	}
+
+	var sessionsList []models.Session
+	if err := json.Unmarshal(data, &sessionsList); err != nil {
+		return err
+	}
+
+	for _, sess := range sessionsList {
+		s.sessions[sess.ID] = sess
+	}
+
+	return nil
+}
+
+func (s *Store) saveSessions() error {
+	var sessionsList []models.Session
+	for _, sess := range s.sessions {
+		sessionsList = append(sessionsList, sess)
+	}
+
+	data, err := json.MarshalIndent(sessionsList, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(s.sessionsPath, data, 0644)
+}
+
+func (s *Store) ensureDefaultSession() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if len(s.sessions) == 0 {
+		sess := models.Session{
+			ID:        uuid.New().String(),
+			Name:      "Geral",
+			CreatedAt: time.Now(),
+		}
+		s.sessions[sess.ID] = sess
+		
+		var sessionsList = []models.Session{sess}
+		data, err := json.MarshalIndent(sessionsList, "", "  ")
+		if err == nil {
+			_ = os.WriteFile(s.sessionsPath, data, 0644)
+		}
+	}
 }
