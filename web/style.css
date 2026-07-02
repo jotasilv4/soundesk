@@ -31,18 +31,23 @@ body {
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 8px;
+    height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-    background: var(--border-subtle);
-    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--border-active);
+    background: rgba(255, 255, 255, 0.45);
+    border: 2px solid transparent;
+    background-clip: padding-box;
 }
 
 /* App Container */
@@ -276,11 +281,13 @@ button {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-vercel-primary:hover {
-    background: #eaeaea;
-    border-color: #eaeaea;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.12);
+@media (hover: hover) {
+    .btn-vercel-primary:hover {
+        background: #eaeaea;
+        border-color: #eaeaea;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.12);
+    }
 }
 
 .btn-vercel-primary:active {
@@ -297,10 +304,12 @@ button {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-vercel-secondary:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-1px);
+@media (hover: hover) {
+    .btn-vercel-secondary:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+    }
 }
 
 .btn-vercel-secondary:active {
@@ -316,11 +325,13 @@ button {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-vercel-danger:hover {
-    background: rgba(255, 75, 75, 0.12);
-    border-color: #ff4b4b;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
+@media (hover: hover) {
+    .btn-vercel-danger:hover {
+        background: rgba(255, 75, 75, 0.12);
+        border-color: #ff4b4b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 75, 75, 0.1);
+    }
 }
 
 .btn-vercel-danger:active {
@@ -337,9 +348,11 @@ button {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-vercel-danger-sm:hover {
-    background: rgba(255, 75, 75, 0.12);
-    border-color: #ff4b4b;
+@media (hover: hover) {
+    .btn-vercel-danger-sm:hover {
+        background: rgba(255, 75, 75, 0.12);
+        border-color: #ff4b4b;
+    }
 }
 
 .w-100 {
@@ -595,9 +608,10 @@ button {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 0.5rem;
-    max-height: 200px;
+    max-height: 380px;
     overflow-y: auto;
     align-content: start;
+    padding-right: 4px;
 }
 
 .sound-pad {
@@ -620,13 +634,15 @@ button {
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.sound-pad:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 
-        0 6px 16px rgba(0, 0, 0, 0.4), 
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+@media (hover: hover) {
+    .sound-pad:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 
+            0 6px 16px rgba(0, 0, 0, 0.4), 
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
 }
 
 .sound-pad:active {
@@ -658,13 +674,17 @@ button {
     z-index: 10;
 }
 
-.sound-pad:hover .pad-delete-btn {
-    opacity: 1;
+@media (hover: hover) {
+    .sound-pad:hover .pad-delete-btn {
+        opacity: 1;
+    }
 }
 
-.sound-pad .pad-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: rgb(239, 68, 68);
+@media (hover: hover) {
+    .sound-pad .pad-delete-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+        color: rgb(239, 68, 68);
+    }
 }
 
 .sound-pad-icon {
@@ -673,8 +693,10 @@ button {
     transition: transform 0.2s ease;
 }
 
-.sound-pad:hover .sound-pad-icon {
-    transform: scale(1.1);
+@media (hover: hover) {
+    .sound-pad:hover .sound-pad-icon {
+        transform: scale(1.1);
+    }
 }
 
 .sound-pad-name {
@@ -688,8 +710,10 @@ button {
     transition: color 0.2s ease;
 }
 
-.sound-pad:hover .sound-pad-name {
-    color: var(--text-primary);
+@media (hover: hover) {
+    .sound-pad:hover .sound-pad-name {
+        color: var(--text-primary);
+    }
 }
 
 /* Sound pad executing transition */
@@ -1201,4 +1225,80 @@ button {
     0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1); }
     70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* Volume Control Styles */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+}
+
+.volume-icon {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 90px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    outline: none;
+    transition: background 0.15s ease;
+}
+
+@media (hover: hover) {
+    .volume-slider:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s ease;
+}
+
+@media (hover: hover) {
+    .volume-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+    }
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s ease;
+}
+
+@media (hover: hover) {
+    .volume-slider::-moz-range-thumb:hover {
+        transform: scale(1.2);
+    }
+}
+
+.volume-percent {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 32px;
+    text-align: right;
 }

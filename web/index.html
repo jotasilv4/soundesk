@@ -68,15 +68,15 @@
                         <form id="upload-form" enctype="multipart/form-data">
                             <div class="input-group">
                                 <label for="sound-name">Nome do Áudio</label>
-                                <input type="text" id="sound-name" name="name" placeholder="Ex: Corneta, Aplauso" required autocomplete="off">
+                                <input type="text" id="sound-name" name="name" placeholder="Ex: Corneta (Opcional se múltiplos)" autocomplete="off">
                             </div>
                             <div class="input-group">
                                 <label for="sound-file" class="file-upload-label">
                                     <span class="upload-icon">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                     </span>
-                                    <span id="file-name-display">Escolher arquivo (MP3/WAV)</span>
-                                    <input type="file" id="sound-file" name="file" accept="audio/mp3,audio/wav,audio/mpeg" required>
+                                    <span id="file-name-display">Escolher arquivo(s) (MP3/WAV)</span>
+                                    <input type="file" id="sound-file" name="file" accept="audio/mp3,audio/wav,audio/mpeg" multiple required>
                                 </label>
                             </div>
                             <button type="submit" id="btn-upload" class="btn-vercel-secondary w-100">Carregar Som</button>
@@ -114,7 +114,11 @@
                                 <div class="eq-bar"></div>
                                 <div class="eq-bar"></div>
                             </div>
-                            <p class="server-status-note">O áudio sairá neste servidor.</p>
+                            <div class="volume-control">
+                                <span class="volume-icon">🔊</span>
+                                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8" class="volume-slider" title="Volume do Deck">
+                                <span id="volume-percent" class="volume-percent">80%</span>
+                            </div>
                         </div>
 
                         <!-- Sounds Grid -->

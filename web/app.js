@@ -4,6 +4,7 @@ let currentSession = null;
 let currentRole = null; // 'server' or 'client'
 let soundsList = [];
 let activeAudios = []; // Keep track of playing HTML5 Audio elements in browser
+let currentVolume = 0.8; // Default volume (80%)
 
 // DOM Elements
 const connectionStatus = document.getElementById('connection-status');
@@ -23,6 +24,8 @@ const btnStopAll = document.getElementById('btn-stop-all');
 const serverStatusView = document.getElementById('server-status-view');
 const soundsGrid = document.getElementById('sounds-grid');
 const activityLog = document.getElementById('activity-log');
+const volumeSlider = document.getElementById('volume-slider');
+const volumePercent = document.getElementById('volume-percent');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,17 +41,41 @@ function setupEventListeners() {
     
     // File upload label updater
     soundFile.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            fileNameDisplay.textContent = e.target.files[0].name;
+        const files = e.target.files;
+        if (files && files.length > 1) {
+            fileNameDisplay.textContent = `${files.length} arquivos selecionados`;
             fileNameDisplay.style.color = 'var(--text-primary)';
+        } else if (files && files.length === 1) {
+            fileNameDisplay.textContent = files[0].name;
+            fileNameDisplay.style.color = 'var(--text-primary)';
+            // If sound name is empty, auto-fill it with file name without extension
+            const soundNameInput = document.getElementById('sound-name');
+            if (soundNameInput && !soundNameInput.value.trim()) {
+                const nameWithoutExt = files[0].name.substring(0, files[0].name.lastIndexOf('.')) || files[0].name;
+                soundNameInput.value = nameWithoutExt;
+            }
         } else {
-            fileNameDisplay.textContent = 'Escolher arquivo (MP3/WAV)';
+            fileNameDisplay.textContent = 'Escolher arquivo(s) (MP3/WAV)';
             fileNameDisplay.style.color = 'var(--text-secondary)';
         }
     });
 
     // Sound Upload
     uploadForm.addEventListener('submit', uploadSound);
+
+    // Volume Control Listener
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            currentVolume = parseFloat(e.target.value);
+            if (volumePercent) {
+                volumePercent.textContent = Math.round(currentVolume * 100) + '%';
+            }
+            // Update volume of any active playing audio in real-time
+            activeAudios.forEach(audio => {
+                audio.volume = currentVolume;
+            });
+        });
+    }
 
     // Leave Session
     btnLeave.addEventListener('click', leaveSession);
@@ -143,28 +170,59 @@ async function createSession() {
 // Upload New Sound
 async function uploadSound(e) {
     e.preventDefault();
-    const formData = new FormData(uploadForm);
+    const files = soundFile.files;
+    if (!files || files.length === 0) {
+        alert('Por favor, selecione pelo menos um arquivo.');
+        return;
+    }
+
+    const soundNameInput = document.getElementById('sound-name');
+    const customName = soundNameInput ? soundNameInput.value.trim() : '';
 
     try {
         btnUpload.disabled = true;
-        btnUpload.textContent = 'Carregando...';
-        const response = await fetch('/api/v1/sounds', {
-            method: 'POST',
-            body: formData
-        });
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // Determine the display name for this audio
+            let name = customName;
+            if (files.length > 1 || !name) {
+                name = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            }
+            
+            if (files.length > 1) {
+                btnUpload.textContent = `Carregando (${i + 1}/${files.length})...`;
+            } else {
+                btnUpload.textContent = 'Carregando...';
+            }
 
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || 'Erro no upload');
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('file', file);
+
+            const response = await fetch('/api/v1/sounds', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || `Erro no upload do arquivo: ${file.name}`);
+            }
         }
 
         uploadForm.reset();
-        fileNameDisplay.textContent = 'Escolher arquivo (MP3/WAV)';
+        fileNameDisplay.textContent = 'Escolher arquivo(s) (MP3/WAV)';
         fileNameDisplay.style.color = 'var(--text-secondary)';
         document.body.classList.remove('show-upload-drawer');
         
         await fetchSounds();
-        showLogMessage('Sistema', 'Novo som adicionado.');
+        if (files.length > 1) {
+            showLogMessage('Sistema', `${files.length} novos áudios adicionados.`);
+        } else {
+            showLogMessage('Sistema', 'Novo som adicionado.');
+        }
     } catch (err) {
         alert('Erro no upload: ' + err.message);
     } finally {
@@ -457,6 +515,9 @@ function handleWSMessage(msg) {
                 const filename = parts[parts.length - 1];
                 const audioUrl = '/audios/' + filename;
                 const audioObj = new Audio(audioUrl);
+                
+                // Apply current volume
+                audioObj.volume = currentVolume;
                 
                 // Track active audio
                 activeAudios.push(audioObj);
