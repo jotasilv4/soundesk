@@ -192,6 +192,16 @@ function renderSoundsGrid() {
 
 // Join WebSocket Session
 function joinSession(sessionId, role) {
+    if (role === 'server') {
+        // Play a silent sound to unlock browser autoplay restrictions
+        const unlockAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAAAD');
+        unlockAudio.play().then(() => {
+            console.log('Audio playback unlocked successfully');
+        }).catch(err => {
+            console.warn('Failed to pre-unlock audio:', err);
+        });
+    }
+
     if (ws) {
         leaveSession();
     }
@@ -443,3 +453,13 @@ function escapeHTML(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+
+// Global unlock on first user click anywhere on the document
+document.addEventListener('click', () => {
+    const unlockAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAAAD');
+    unlockAudio.play().then(() => {
+        console.log('Global audio playback unlocked');
+    }).catch(err => {
+        console.warn('Global audio unlock failed:', err);
+    });
+}, { once: true });
