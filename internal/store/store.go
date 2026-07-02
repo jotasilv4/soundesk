@@ -38,6 +38,12 @@ func NewStore(audiosDir, metadataPath string) (*Store, error) {
 	return s, nil
 }
 
+func (s *Store) AudiosDir() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.audiosDir
+}
+
 func (s *Store) loadMetadata() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

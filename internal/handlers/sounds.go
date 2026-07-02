@@ -36,7 +36,7 @@ func (h *SoundHandler) Create(c *gin.Context) {
 	
 	uniqueID := uuid.New().String()
 	destName := uniqueID + ext
-	destPath := filepath.Join("audios", destName)
+	destPath := filepath.Join(h.store.AudiosDir(), destName)
 
 	if err := c.SaveUploadedFile(file, destPath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save file: " + err.Error()})
